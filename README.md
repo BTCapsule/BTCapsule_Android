@@ -14,7 +14,7 @@ BTCapsule for Android is simple to set up, and adds additional safety features i
 
 Once BTCapsule is set up, it is very important that you disable internet access and never allow internet on the Android device again. BTCapsule can run on practically any Android device, so it is recommended that you purchase the cheapest phone you can find. 
 
-BTCapsule is not a hot wallet. It creates a "paper wallet" and is for serious HODLers. Once Bitcoin is sent to the P2SH address, you must redeem the entire amount (minus miner fees). Any amount that is not redeemed will go to the miners, so quadruple check before you redeem.
+BTCapsule is not a hot wallet. It creates a "paper wallet" and is for serious HODLers only. Once Bitcoin is sent to the P2SH address, you must redeem the entire amount (minus miner fees). Any amount that is not redeemed will go to the miners, so quadruple check before you redeem.
 
 **How to use BTCapsule on Android**
 
@@ -28,7 +28,7 @@ First you need to install four apps from the Play Store:
 
 4. Microsoft Word
 
-Open Pydroid, tap on the menu, and choose Pip. Install the following dependancies:
+Open Pydroid, tap on the menu, and choose Pip. Install the following dependencies:
 
 1. bitcoin-utils
 
@@ -44,3 +44,8 @@ Now copy the BTCapsule code, and paste it into Microsoft Word. Select all the te
 
 That is it! Now you can hit the Play button, and BTCapsule will run in your Android. Make sure to save the program and name it BTCapsule.py (or BTCapsule_testnet.py for the testnet version).
 
+BTCapsule was not developed for touchscreen devices, so I have added some unique functionality.
+
+To copy, double tap on a string within a form, and choose Copy
+
+To paste, tap on any other form. If there are recent words in your clipboard, they will be pasted into the first form you tap. You may have to delete these, but it will only happen once.
