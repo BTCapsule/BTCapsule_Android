@@ -28,24 +28,16 @@ First you need to install four apps from the Play Store:
 
 4. Microsoft Word
 
-Open Pydroid, tap on the menu, and choose Pip. Install the following dependencies:
+Copy the code for install_dependencies.py and paste it into Microsoft Word. Select all the text in Microsoft Word, copy, and paste it into Pydroid. I don't know why you have to use Microsoft Word, but if you try to paste the code directly, it will not add the line breaks and whitespace. Microsoft Word is the only app I have found that will let you copy and paste the working program.
 
-1. bitcoin-utils
+Hit the Play button to install the dependencies.
 
-2. pypng 
-
-3. pyqrcode
-
-Go back to the menu and open the terminal. Write the following command:
-
-python3 -m pip install Pillow==9.1.0
-
-Now copy the BTCapsule code, and paste it into Microsoft Word. Select all the text in Microsoft Word, copy, and paste it into Pydroid. I don't know why you have to use Microsoft Word, but if you try to paste the code directly, it will not add the line breaks and whitespace. Microsoft Word is the only app I have found that will let you copy and paste the working program.
+Now copy the BTCapsule code, and paste it into Microsoft Word. Select all the text in Microsoft Word, copy, and paste it into Pydroid.
 
 That is it! Now you can hit the Play button, and BTCapsule will run in your Android. Make sure to save the program and name it BTCapsule.py (or BTCapsule_testnet.py for the testnet version).
 
 BTCapsule was not developed for touchscreen devices, so I have added some unique functionality.
 
-To copy, double tap on a string within a form, and choose Copy
+To copy, double tap on a string within a form, and choose Copy.
 
 To paste, tap on any other form. If there are recent words in your clipboard, they will be pasted into the first form you tap. You may have to delete these, but it will only happen once.
