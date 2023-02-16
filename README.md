@@ -1,4 +1,4 @@
-This repository is to use BTCapsule for Android, and is recommended over the original BTCapsule for reasons discussed below. To learn more about BTCapsule and how to use it, please visit https://github.com/BTCapsule/BTCapsule.
+This repository is to use BTCapsule for Android, and is recommended over the original BTCapsule for reasons discussed below. To learn more about BTCapsule and how to use it, please visit https://github.com/BTCapsule/BTCapsule. The Android version looks different, but works the exact same way.
 
 BTCapsule creates a P2SH address that is timelocked to 500,000,001 (the earliest timestamp recognized by the Bitcoin network) at the script level. The sender wallet contains a raw transaction that is timelocked to 500,000,001 at the transaction level and allows you, the original holder, to redeem your Bitcoin at any time. The receiver wallet contains a raw transaction that is locked at whatever date you choose, which is then converted to a unix timestamp.
 
@@ -36,8 +36,6 @@ Now copy the BTCapsule code, and paste it into Microsoft Word. Select all the te
 
 That is it! Now you can hit the Play button, and BTCapsule will run in your Android. Make sure to save the program and name it BTCapsule.py (or BTCapsule_testnet.py for the testnet version).
 
-BTCapsule was not developed for touchscreen devices, so I have added some unique functionality.
+Hint:
 
-To copy, double tap on a string within a form, and choose Copy.
-
-To paste, tap on any other form. If there are recent words in your clipboard, they will be pasted into the first form you tap. You may have to delete these, but it will only happen once.
+The Android device you use for BTCapsule should remain offline at all times. To easily copy the tx id from another device, install a QR code creator on the other device. Paste the tx id into the QR creator, and use your Android's camera to scan and copy it.
