@@ -1,21 +1,31 @@
+import kivy
+kivy.require('1.11.1')
+
+from kivy.app import App
+from kivy.uix.tabbedpanel import TabbedPanel, TabbedPanelHeader
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
+from kivy.uix.image import Image
+
 import os
 import os.path
 import shutil
-from tkinter import *
-from tkinter import ttk
+
 from os.path import exists
 import datetime
 import dateutil.parser as dp
 import time
 from decimal import Decimal
 from stat import S_IREAD
-from itertools import islice
+
 
 
 import pyqrcode
 import png
 from pyqrcode import QRCode
-from PIL import ImageTk, Image
+
 
 from bitcoinutils.setup import setup
 from bitcoinutils.utils import to_satoshis
@@ -25,8 +35,13 @@ from bitcoinutils.script import Script
 from bitcoinutils.constants import TYPE_ABSOLUTE_TIMELOCK
 
 
-root = Tk()
 setup("testnet")
+
+sender_exists = exists("sender_wallet_testnet.txt")
+rec_exists = exists("receiver_wallet_testnet.txt")
+
+
+seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 500000001)
 
 
 def sweep_wallet(wa, t, s, prk, a):
@@ -94,73 +109,121 @@ def sweep_wallet(wa, t, s, prk, a):
     redeem_file = open("redeem.txt", "w")
 
     redeem_file.write("Redeem script: " + f"{signed_tx}")
+    
+    redeem_qr = pyqrcode.create(signed_tx) 
+            
+    redeem_qr.png("redeem_qr.png", scale=6)
+    redeem_qr.png("redeem_qr.png", scale=6)
+
+               
+                
 
     redeem_file.close()
 
     os.chmod("redeem.txt", S_IREAD)
 
 
-def main():
 
-    sender_exists = exists("sender_wallet_testnet.txt")
-    rec_exists = exists("receiver_wallet_testnet.txt")
-    btc_exists = exists("BTCapsule.exe")
 
-    seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 500000001)
 
-    entry_y = 200
 
-    canvas1 = Canvas(root, width=1440, height=2960, bg="white", highlightthickness=0)
 
-    canvas1.pack()
 
-    canvas1.create_text(
-        720, entry_y - 75, fill="black", font="Arial 5 bold", text="CREATE TIMELOCK"
-    )
 
-    canvas1.create_text(
-        720, entry_y - 25, fill="black", font="Arial 5", text="Generate a P2SH address"
-    )
 
-    p2sh = Entry(root, width=42, relief=SOLID)
-    canvas1.create_window(720, entry_y +50, window=p2sh)
 
-    canvas1.create_text(
-        720, entry_y + 325, fill="black", font="Arial 5", text="Sender's Wallet"
-    )
+class MyGrid(GridLayout):
+    def __init__(self, **kwargs):
+        super(MyGrid, self).__init__(**kwargs)
+        self.cols = 1
+        self.add_widget(Label(text="Generate a P2SH Address:"))
+        self.p2sh = TextInput(multiline=False)
+        self.add_widget(self.p2sh)
 
-    canvas1.create_text(60, entry_y + 400, fill="black", font="Arial 5", text="Priv")
+        self.generate_button = Button(text="Generate Wallet", font_size=50)
+        self.generate_button.bind(on_press=self.generate_priv)
+        self.add_widget(self.generate_button)
 
-    canvas1.create_text(100, entry_y + 500, fill="black", font="Arial 5", text="Addr")
+        self.add_widget(Label(text="Private Key"))
+        self.sk = TextInput(multiline=False, font_size=45)
+        self.add_widget(self.sk)
 
-    sk = Entry(root, width=55, relief=SOLID)
-    canvas1.create_window(765, entry_y + 400, window=sk)
+        self.add_widget(Label(text="Public Address"))
+        self.sa = TextInput(multiline=False)
+        self.add_widget(self.sa)
+       
+        
+        self.rk = TextInput(multiline=False, size_hint = (0,0))
+        self.add_widget(self.rk)
+       
+        self.ra = TextInput(multiline=False, size_hint = (0,0))
+        self.add_widget(self.ra)
 
-    sa = Entry(root, width=50, relief=SOLID)
-    canvas1.create_window(760, entry_y + 500, window=sa)
+        rec_create_priv = PrivateKey()
+        rec_privk = rec_create_priv.to_wif(compressed=True)
+    
+        rec_pub = rec_create_priv.get_public_key()
+    
+        rec_address = rec_pub.get_address()
+    
+        rec_pubk = rec_address.to_string()
+        
+        self.rk.text = f"{rec_privk}"
+        self.ra.text = f"{rec_pubk}"
 
-    rk = Entry(root, width=42, relief=SOLID)
-    canvas1.create_window(3000, entry_y + 400, window=rk)
 
-    ra = Entry(root, width=42, relief=SOLID)
-    canvas1.create_window(3000, entry_y + 500, window=ra)
 
-    rec_create_priv = PrivateKey()
-    rec_privk = rec_create_priv.to_wif(compressed=True)
 
-    rec_pub = rec_create_priv.get_public_key()
+        self.add_widget(Label(text="Enter date: MM-DD-YYYY"))
+        self.date = TextInput(multiline=False)
+        self.add_widget(self.date)
+       
+        self.add_widget(Label(text="Paste tx from transaction above"))
+        self.tx_id = TextInput(multiline=False, font_size=40)
+        self.add_widget(self.tx_id)
+       
+        self.add_widget(Label(text="Vout"))
+        self.vout = TextInput(multiline=False)
+        self.add_widget(self.vout)
+       
+        self.add_widget(Label(text="BTC"))
+        self.btc = TextInput(multiline=False)
+        self.add_widget(self.btc)
+  
+        self.prompt = Label(text="")
+        self.add_widget(self.prompt)
+        self.qr_text = Label(text="")
+        self.add_widget(self.qr_text)
+        self.image1 = Image(size_hint_y=4)
+        self.image1.color = (0,0,0,0)
+        self.add_widget(self.image1)
+        
+        self.enter_button = Button(text="Enter", font_size=50)
+        self.enter_button.bind(on_press=self.complete)
+        self.add_widget(self.enter_button)
+        
+        for i in range(6):
+            self.add_widget(Label(text=""))
 
-    rec_address = rec_pub.get_address()
+                
+       
+        
+        
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+            
+    
 
-    rec_pubk = rec_address.to_string()
+    
 
-    rk.insert(END, f"{rec_privk}")
-    rk.bind("<FocusIn>", lambda args: rk.insert(END, ""))
 
-    ra.insert(END, f"{rec_pubk}")
-    ra.bind("<FocusIn>", lambda args: ra.insert(END, ""))
 
-    def generate_wallet():
+    def generate_priv(self, instance): 
+    
 
         sender_create_priv = PrivateKey()
         sender_privk = sender_create_priv.to_wif(compressed=True)
@@ -191,108 +254,52 @@ def main():
         addr = P2shAddress.from_script(redeem_script)
         p2sh_addr = addr.to_string()
 
-        p2sh.delete(0, END)
-        p2sh.insert(END, f"{p2sh_addr}")
-        p2sh.bind("<FocusIn>", lambda args: p2sh.insert(END, ""))
-
-        sk.delete(0, END)
-        sk.insert(END, f"{sender_privk}")
-        sk.bind("<FocusIn>", lambda args: sk.insert(END, ""))
-
-        sa.delete(0, END)
-        sa.insert(END, f"{sender_pubk}")
-        sa.bind("<FocusIn>", lambda args: sa.insert(END, ""))
-
-        canvas1.create_text(
-            720,
-            entry_y + 120,
-            fill="black",
-            font="Arial 5",
-            text="Add funds to address",
-        )
-
+        
+        self.p2sh.text = str(f"{p2sh_addr}")
+        self.sk.text = str(f"{sender_privk}")
+        self.sa.text = str(f"{sender_pubk}")
+        
+        
+        
         qr_p2sh = pyqrcode.create(p2sh_addr)
 
         qr_p2sh.png("timelock_qr.png", scale=6)
-        qr_p2sh.png("timelock_qr_copy.png", scale=6)
+        self.image1.color = (1,1,1,1)
+        self.image1.source = 'timelock_qr.png'
+        self.remove_widget(self.generate_button)
+        self.qr_text.text = 'Add funds to P2SH Address'     
 
-        image1 = Image.open("timelock_qr.png")
 
-        resized_image = image1.resize((200, 200), Image.Resampling.LANCZOS)
-        test = ImageTk.PhotoImage(resized_image)
-        label1 = Label(image=test)
-        label1.image = test
-        label1.place(x=1000, y=entry_y +130)
 
-    generate_private = Button(text="Generate", command=generate_wallet)
 
-    generate_private.pack()
-    canvas1.create_window(720, entry_y + 225, window=generate_private)
 
-    root.bind("<Return>", lambda x: generate_private_key)
-
-    canvas1.create_text(
-        720, entry_y + 600, fill="black", font="Arial 5", text="Enter date: MM-DD-YYYY"
-    )
-
-    def timestamp_color():
-        global timestamp
-
-    timestamp = Entry(root, fg="black", relief=SOLID)
-
-    canvas1.create_window(720, entry_y + 700, window=timestamp)
-
-    txid_input = Entry(root, width=60, relief=SOLID)
-
-    canvas1.create_window(720, entry_y + 900, window=txid_input)
-
-    canvas1.create_text(
-        720,
-        entry_y + 800,
-        fill="black",
-        font="Arial 5",
-        text="Paste txid/hash from transaction above",
-    )
-
-    vout_enter = Entry(root, relief=SOLID, width=5)
-
-    canvas1.create_window(500, entry_y + 1075, window=vout_enter)
-
-    canvas1.create_text(500, entry_y + 1000, fill="black", font="Arial 5", text="VOUT")
-    
-    amount = Entry(root, relief=SOLID, width=20)
-
-    canvas1.create_window(1020, entry_y + 1075, window=amount)
-
-    canvas1.create_text(1020, entry_y + 1000, fill="black", font="Arial 5", text="BTC")
-
-    def complete():
-
+    def complete(self, instance):
+        
         if (
-            timestamp.get() != ""
-            and txid_input.get() != ""
-            and amount.get() != ""
-            and p2sh.get() != ""
-            and sk.get() != ""
-            and sa.get() != ""
+            self.date.text != ""
+            and self.tx_id.text != ""
+            and self.btc.text != ""
+            and self.p2sh.text != ""
+            and self.sk.text != ""
+            and self.sa.text != ""
         ):
 
    
             
 
 
-            txid = txid_input.get()
-            satoshis = Decimal(amount.get())
+            txid = self.tx_id.text
+            satoshis = Decimal(self.btc.text)
 
-            sender_privk = sk.get()
-            sender_pubk = sa.get()
+            sender_privk = self.sk.text
+            sender_pubk = self.sa.text
 
-            rec_privk = rk.get()
-            rec_pubk = ra.get()
+            rec_privk = self.rk.text
+            rec_pubk = self.ra.text
 
-            iso = timestamp.get()
-            pubk = p2sh.get()
-            vout = int(vout_enter.get())
+            iso = self.date.text
+            pubk = self.p2sh.text
+            vout = int(self.vout.text)
 
             def validate(date_text):
                 try:
@@ -420,7 +427,7 @@ to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are include
 				
 				"""
 
-                p2sh_addr = p2sh.get()
+                p2sh_addr = self.p2sh.text
 
                 sender_wallet = open("sender_wallet_testnet.txt", "w")
 
@@ -491,6 +498,19 @@ this means the transaction is working as expected. Please wait a few hours and t
                 )
 
                 rec_wallet.close()
+                
+                
+                sender_qr = pyqrcode.create(sender_signed_tx)
+                receiver_qr = pyqrcode.create(rec_signed_tx)
+
+                sender_qr.png("sender_redeem.png", scale=6)
+                sender_qr.png("sender_redeem.png", scale=6)
+             
+                
+                receiver_qr.png("receiver_redeem.png", scale=6)
+                receiver_qr.png("receiver_redeem.png", scale=6)
+            
+                
 
                 os.chmod("receiver_wallet_testnet.txt", S_IREAD)
                  
@@ -500,8 +520,7 @@ this means the transaction is working as expected. Please wait a few hours and t
                 
                 os.mkdir('sender_files_testnet')
                 send_files = 'sender_files_testnet/'
-             
-                shutil.copy('timelock_qr_copy.png', rec_path)
+                shutil.copy('receiver_redeem.png', rec_path)
                 shutil.copy('receiver_wallet_testnet.txt', rec_path)
                 
                 shutil.copy('BTCapsule_testnet.py', rec_path)
@@ -517,339 +536,147 @@ this means the transaction is working as expected. Please wait a few hours and t
                 
                 shutil.copy('BTCapsule_testnet.py', send_files)
 
-                if btc_exists == True:
-                    shutil.copy('BTCapsule.exe', send_files)
-                    shutil.copy('BTCapsule.exe', rec_path)
-
-                label1 = Label(
-                    root,
-                    bg="white",
-                    text="                    Success!                      ",
-                )
-                canvas1.create_window(720, entry_y + 1350, window=label1)
-
+                
+                self.prompt.text='Success'
             else:
 
-                canvas1.create_text(
-                    720,
-                    entry_y + 1350,
-                    fill="black",
-                    font="Arial 5",
-                    text="Enter a valid year: MM-DD-YYYY",
-                )
+                self.prompt.text='Enter date MM-DD-YYYY'
 
         else:
 
-            canvas1.create_text(
-                720,
-                entry_y + 1350,
-                fill="black",
-                font="Arial 5",
-                text="Please enter all fields",
-            )
+            self.prompt.text='Please Enter All Fields'
+            
 
-    button1 = Button(text="Enter", command=complete)
-    canvas1.create_window(720, entry_y + 1250, window=button1)
 
+
+
+
+
+
+
+class SweepWallet(GridLayout):
+    
+    def __init__(self, **kwargs):
+        super(SweepWallet, self).__init__(**kwargs)
+        self.cols = 1
+        
+
+        self.add_widget(Label(text="Private Key"))
+        addr_enter = TextInput(multiline=False)
+        self.add_widget(addr_enter)
+        
+        self.add_widget(Label(text="Public Address"))
+        sat_enter = TextInput(multiline=False)
+        self.add_widget(sat_enter)
+        
+        self.add_widget(Label(text=""))
+        prompt = Label(text="")
+        self.add_widget(prompt)
+                  
+
+  
     # SWEEP WALLET
 
-    canvas1.create_line(
-        0, entry_y + 1400, entry_y + 1400, entry_y + 1400, fill="black", width=5
-    )
 
-    canvas1.create_text(
-        720, entry_y + 1450, fill="black", font="Arial 5 bold", text="SWEEP WALLET"
-    )
-
-    canvas1.create_text(
-        720,
-        entry_y + 1550,
-        fill="black",
-        font="Arial 5",
-        text="When raw transaction is successful, use \nthis field to send funds to your own wallet",
-    )
-
-    addr_enter = Entry(root, width=59, relief=SOLID)
-    sat_enter = Entry(root, width=59, relief=SOLID)
-
-    canvas1.create_text(
-        720,
-        entry_y + 1700,
-        fill="black",
-        font="Arial 5",
-        text="Enter address to send funds",
-    )
-
-    canvas1.create_window(720, entry_y + 1800, window=addr_enter)
-
-    canvas1.create_text(
-        720, entry_y + 1900, fill="black", font="Arial 5", text="Enter BTC amount"
-    )
-
-    canvas1.create_window(720, entry_y + 2000, window=sat_enter)
-
-    def redeem():
-
-        if sat_enter.get() != "" and addr_enter.get() != "":
-
-            if sender_exists == True:
-
-                with open("sender_wallet_testnet.txt", "r") as f:
-
-                    f.seek(0)
-                    lines = f.readlines()
-
-                    t = lines[0]
-                    txid = t[6:].rstrip()
-
-                    p = lines[2]
-                    private_key = p[13:].rstrip()
-
-                    ad = lines[4]
-                    address = ad[16:].rstrip()
-
-                satoshis = Decimal(sat_enter.get())
-                which_addr = addr_enter.get()
-
-                sweep_wallet(which_addr, txid, satoshis, private_key, address)
-
-                label1 = Label(
-                    root,
-                    bg="white",
-                    text="                 Success!                   ",
-                )
-                canvas1.create_window(723, entry_y + 2200, window=label1)
-
-            if rec_exists == True and sender_exists == False:
-
-                with open("receiver_wallet_testnet.txt", "r") as f:
-
-                    f.seek(0)
-                    lines = f.readlines()
-
-                    t = lines[0]
-                    txid = t[6:].rstrip()
-
-                    p = lines[2]
-                    private_key = p[13:].rstrip()
-
-                    ad = lines[4]
-                    address = ad[16:].rstrip()
-
-                satoshis = Decimal(sat_enter.get())
-
-                which_addr = addr_enter.get()
-
-                sweep_wallet(which_addr, txid, satoshis, private_key, address)
-
-                label1 = Label(
-                    root,
-                    bg="white",
-                    text="                 Success!                   ",
-                )
-                canvas1.create_window(723, entry_y + 2200, window=label1)
-
-            if rec_exists == False and sender_exists == False:
-
-                label1 = Label(
-                    root,
-                    bg="white",
-                    text="Missing wallet. Move wallet to this \nfolder and restart BTCapsule",
-                )
-                canvas1.create_window(723, entry_y + 2220, window=label1)
-
-    send = Button(text="Send", command=redeem)
-    send.pack()
-
-    canvas1.create_window(720, entry_y + 2100, window=send)
-
-    root.title("Bitcoin Time Capsule")
+        def redeem(self):
     
+            if sat_enter.text != "" and addr_enter.text != "":
     
+                if sender_exists == True:
     
-    def copy_select(): 
+                    with open("sender_wallet_testnet.txt", "r") as f:
     
+                        f.seek(0)
+                        lines = f.readlines()
     
-         
-        if p2sh.select_present():
-            inp = p2sh.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
-
-         
-        if sk.select_present():
-            inp = sk.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
+                        t = lines[0]
+                        txid = t[6:].rstrip()
     
-        if sa.select_present():
-            inp = sa.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
-
-         
-        if timestamp.select_present():
-            inp = timestamp.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
-         
-        if txid_input.select_present():
-            inp = txid_input.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
-            
-         
-        if vout_enter.select_present():
-            inp = vout_enter.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
-            
-         
-        if amount.select_present():
-            inp = amount.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-         
-        if addr_enter.select_present():
-            inp = addr_enter.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
-            
+                        p = lines[2]
+                        private_key = p[13:].rstrip()
     
-        if sat_enter.select_present():
-            inp = sat_enter.get() 
-            root.clipboard_clear() 
-            root.clipboard_append(inp)
+                        ad = lines[4]
+                        address = ad[16:].rstrip()
     
+                    satoshis = Decimal(sat_enter.text)
+                    which_addr = addr_enter.text
     
+                    sweep_wallet(which_addr, txid, satoshis, private_key, address)
     
+                    prompt.text="Success"
+                    
+                if rec_exists == True and sender_exists == False:
     
-    def paste(self): 
+                    with open("receiver_wallet_testnet.txt", "r") as f:
+    
+                        f.seek(0)
+                        lines = f.readlines()
+    
+                        t = lines[0]
+                        txid = t[6:].rstrip()
+    
+                        p = lines[2]
+                        private_key = p[13:].rstrip()
+    
+                        ad = lines[4]
+                        address = ad[16:].rstrip()
+    
+                    satoshis = Decimal(sat_enter.text)
+    
+                    which_addr = addr_enter.text
+    
+                    sweep_wallet(which_addr, txid, satoshis, private_key, address)
+    
+                    prompt.text="Success"
+                    
+                    
+                if rec_exists == False and sender_exists == False:
+    
+                    prompt.text="Missing wallet. Move wallet to\nthis folder and restart BTCapsule.\nIf wallet exists, open BTCapsule from Pydroid."                        
         
-        
-        posy = root.winfo_pointery()
-        posx = root.winfo_pointerx()
-        
-        
-        
-        #def callback(event):
-        
-     #   if p2sh.select_present():
-         
-        
-            
-        if posy > 240 and posy <280:
-            clipboard = root.clipboard_get()
-            p2sh.insert('end',clipboard)
-            root.clipboard_clear() 
-        
-    # Get the copied item from system clipboard
-        if posy > 590 and posy < 650:
-            clipboard = root.clipboard_get()
-            sk.insert('end',clipboard)
-            root.clipboard_clear() 
-            
-        if posy > 690 and posy < 750:
-            clipboard = root.clipboard_get()
-            sa.insert('end',clipboard)
-            root.clipboard_clear() 
-            
-        if posy > 890 and posy < 950:
-            clipboard = root.clipboard_get()
-            timestamp.insert('end',clipboard)
-            root.clipboard_clear() 
-            
-        if posy > 1090 and posy < 1150:
-            clipboard = root.clipboard_get()
-            txid_input.insert('end',clipboard)
-            root.clipboard_clear() 
-            
-        if (posy > 1265 and posy < 1375) and (posx > 200 and posx < 700):
-            clipboard = root.clipboard_get()
-            vout_enter.insert('end',clipboard)
-            root.clipboard_clear() 
-           
-          
-        if (posy > 1265 and posy < 1375) and (posx > 520 and posx < 1320):
-            clipboard = root.clipboard_get()
-            amount.insert('end',clipboard)
-            root.clipboard_clear()     
-            
-        if posy > 1990 and posy < 2100:
-            clipboard = root.clipboard_get()
-            addr_enter.insert('end',clipboard)
-            root.clipboard_clear() 
-            
-        if posy > 2190 and posy < 2300:
-            clipboard = root.clipboard_get()
-            sat_enter.insert('end',clipboard)
-            root.clipboard_clear() 
-                     
+     
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.generate_button = Button(text="Generate Priv", font_size=36)
+        self.generate_button.bind(on_press=redeem)
+        self.add_widget(self.generate_button)
 
-    # Insert the item into the entry widget def 
+        for i in range(20):
+            self.add_widget(Label(text=""))
+
                 
-             
-
-    
-    
-    m = Menu(root, tearoff = 0) 
-
-    
-    m.add_command(label ="Copy", command=copy_select) 
-
-    #m.add_command(label ="Paste", command=paste) 
-
-    
-    
-    
-
-    def do_popup(event): 
-
-        try: 
+       
         
-            
-
-                m.tk_popup(event.x_root, event.y_root-200) 
-               
-                
-                        
-            
-                
-        finally: 
-
-            m.grab_release() 
-
-
-    
-    #p2sh.bind("Double-Button-1",do_popup)
-    
-   # addr_enter.bind("Double-Button-1",do_popup)
         
-    
-        
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+        self.add_widget(Label(text=""))
+  
+  
+
+
+
+class TabbedPanelApp(App):
+    def build(self):
+        tabbed_panel = TabbedPanel(do_default_tab=False)
+        tabbed_panel.background_color = (1, 1, 1, 1) 
+        tabbed_panel.tab_height = 75
+
+        tab1 = TabbedPanelHeader(text='BTCapsule', font_size = 36, size_hint=(None, None), height=75)
+        tab2 = TabbedPanelHeader(text='Sweep Wallet', font_size =36, size_hint=(None, None), height=75)
+
+
+        tab1.content = MyGrid()
+        tab2.content = SweepWallet()
+
  
-    root.bind_all("<Double-Button-1>", do_popup) 
-    
-    
+        tabbed_panel.add_widget(tab1)
+        tabbed_panel.add_widget(tab2)
 
-    
-    root.bind_all("<Button-1>", paste)
-        
-        
-        
-    
-    
-    
+        return tabbed_panel
 
-    root.mainloop()
-
-
-if __name__ == "__main__":
-    main()
-
+if __name__ == '__main__':
+    TabbedPanelApp().run()
