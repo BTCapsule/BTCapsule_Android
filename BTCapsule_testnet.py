@@ -418,9 +418,8 @@ another redeem script. Paste this into the block explorer to send the bitcoin to
 				
 				
 				
-*IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
-miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
-the full amount, you must add some satoshis to the timelock address to cover the fees.
+*IMPORTANT!* Sweeping this wallet will remove all bitcoin. You must input a smaller amount to pay for 
+miner fees. The difference between the unspent amount and the input will go to the miners.
 To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet_testnet.txt, and timelock_qr_copy.png 
 to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are included in their wallet.
 				
@@ -466,9 +465,8 @@ another redeem script. Paste this into the block explorer to send the bitcoin to
 				
 				
 				
-*IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
-miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
-the full amount, you must add some satoshis to the timelock address to cover the fees.
+*IMPORTANT!* Sweeping this wallet will remove all bitcoin. You must input a smaller amount to pay for 
+miner fees. The difference between the unspent amount and the input will go to the miners. 
 The redeem time is set at 12:00AM on the redeem date. It may take several hours before the network will
 accept your redeem script. If you get an error:
 sendrawtransactiom RPC error: 
