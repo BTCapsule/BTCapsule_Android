@@ -186,7 +186,7 @@ class MyGrid(GridLayout):
         self.vout = TextInput(multiline=False)
         self.add_widget(self.vout)
        
-        self.add_widget(Label(text="BTC"))
+        self.add_widget(Label(text="BTC Amount Minus Miner Fees"))
         self.btc = TextInput(multiline=False)
         self.add_widget(self.btc)
   
@@ -559,11 +559,11 @@ class SweepWallet(GridLayout):
         self.cols = 1
         
 
-        self.add_widget(Label(text="Private Key"))
+        self.add_widget(Label(text="Address to Send Bitcoin"))
         addr_enter = TextInput(multiline=False)
         self.add_widget(addr_enter)
         
-        self.add_widget(Label(text="Public Address"))
+        self.add_widget(Label(text="BTC Amount Minus Miner Fees"))
         sat_enter = TextInput(multiline=False)
         self.add_widget(sat_enter)
         
@@ -635,7 +635,7 @@ class SweepWallet(GridLayout):
      
         self.add_widget(Label(text=""))
         self.add_widget(Label(text=""))
-        self.generate_button = Button(text="Generate Priv", font_size=36)
+        self.generate_button = Button(text="Enter", font_size=50)
         self.generate_button.bind(on_press=redeem)
         self.add_widget(self.generate_button)
 
