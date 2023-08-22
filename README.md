@@ -18,7 +18,7 @@ BTCapsule is not a hot wallet. It creates a "paper wallet" and is for serious HO
 
 **How to use BTCapsule on Android**
 
-First you need to install four apps from the Play Store:
+First you need to install three apps from the Play Store:
 
 1. Pydroid 3
 
@@ -26,13 +26,35 @@ First you need to install four apps from the Play Store:
 
 3. Pydroid permissions plugin
 
-4. Microsoft Word
+Copy the code below and paste it into Pydroid:
 
-Copy the code for install_dependencies.py and paste it into Microsoft Word. Select all the text in Microsoft Word, copy, and paste it into Pydroid. I don't know why you have to use Microsoft Word, but if you try to paste the code directly, it will not add the line breaks and whitespace. Microsoft Word is the only app I have found that will let you copy and paste the working program.
+```
+import requests
+import os
+from os import getcwd 
+import subprocess
 
-Hit the Play button to install the dependencies.
+dir = "BTCapsule"
+os.makedirs(dir)
 
-Now copy the BTCapsule code, and paste it into Microsoft Word. Select all the text in Microsoft Word, copy, and paste it into Pydroid.
+url = "https://raw.githubusercontent.com/BTCapsule/BTCapsule_Android/main/BTCapsule_testnet.py" 
+directory = getcwd() 
+os.path.join(directory, dir)
+filename = directory +  '/BTCapsule/BTCapsule_test.py' 
+r = requests.get(url) 
+f = open(filename,'wb') 
+f.write(r.content)
+
+url2 = "https://raw.githubusercontent.com/BTCapsule/BTCapsule_Android/main/install_dependencies.py" 
+directory2 = getcwd() 
+filename2 = directory2 + '/BTCapsule/install_dependencies.py' 
+r2 = requests.get(url2) 
+f2 = open(filename2,'wb') 
+f2.write(r2.content)
+```
+Tap the folder icon at the top of Pydroid and enter the newly created folder called BTCapsule. Choose install_dependencies.py and tap the Play button to install the dependencies.
+
+Tap the folder icon again and open BTCapsule.py inside the BTCapsule folder.
 
 That is it! Now you can hit the Play button, and BTCapsule will run in your Android. Make sure to save the program and name it BTCapsule.py (or BTCapsule_testnet.py for the testnet version).
 
