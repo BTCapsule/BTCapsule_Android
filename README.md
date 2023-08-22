@@ -64,9 +64,11 @@ if response.status_code == 200:
     
     print("File saved successfully.")
 ```
-Tap the folder icon at the top of Pydroid and enter the newly created folder called BTCapsule. Choose install_dependencies.py and tap the Play button to install the dependencies.
+Press the Play button and wait for BTCapsule to build. Tap the back button at the top.
 
-Tap the folder icon again and open BTCapsule.py inside the BTCapsule folder.
+**TURN OFF THE INTERNET!!!**
+
+Tap the folder icon and open BTCapsule.py inside the BTCapsule folder from Internal Storage.
 
 That is it! Now you can hit the Play button, and BTCapsule will run in your Android. Make sure to save the program and name it BTCapsule.py (or BTCapsule_testnet.py for the testnet version).
 
