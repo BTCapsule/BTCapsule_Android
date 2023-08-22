@@ -29,28 +29,40 @@ First you need to install three apps from the Play Store:
 Copy the code below and paste it into Pydroid:
 
 ```
-import requests
 import os
-from os import getcwd 
+import requests
 import subprocess
 
-dir = "BTCapsule"
-os.makedirs(dir)
+required_packages = ['bitcoin-utils', 'pypng', 'pyqrcode', 'Pillow==9.1.0']
 
-url = "https://raw.githubusercontent.com/BTCapsule/BTCapsule_Android/main/BTCapsule_testnet.py" 
-directory = getcwd() 
-os.path.join(directory, dir)
-filename = directory +  '/BTCapsule/BTCapsule_test.py' 
-r = requests.get(url) 
-f = open(filename,'wb') 
-f.write(r.content)
+missing_packages = [package for package in required_packages if not any(package in line.decode() for line in subprocess.Popen(["pip", "list"], stdout=subprocess.PIPE).stdout.readlines())]
 
-url2 = "https://raw.githubusercontent.com/BTCapsule/BTCapsule_Android/main/install_dependencies.py" 
-directory2 = getcwd() 
-filename2 = directory2 + '/BTCapsule/install_dependencies.py' 
-r2 = requests.get(url2) 
-f2 = open(filename2,'wb') 
-f2.write(r2.content)
+if missing_packages:
+ 
+    try:
+        subprocess.check_call(["pip", "install"] + missing_packages, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print("Installed missing packages:", ", ".join(missing_packages))
+    except subprocess.CalledProcessError as e:
+        print("Error installing packages:", e)
+
+raw_url = "https://raw.githubusercontent.com/BTCapsule/BTCapsule_Android/main/BTCapsule_testnet.py"
+
+response = requests.get(raw_url)
+
+if response.status_code == 200:
+
+    raw_code = response.content
+    
+    directory_name = "BTCapsule"
+    if not os.path.exists(directory_name):
+        os.makedirs(directory_name)
+    
+    local_file_path = os.path.join(directory_name, "BTCapsule_test.py")
+    
+    with open(local_file_path, "wb") as file:
+        file.write(raw_code)
+    
+    print("File saved successfully.")
 ```
 Tap the folder icon at the top of Pydroid and enter the newly created folder called BTCapsule. Choose install_dependencies.py and tap the Play button to install the dependencies.
 
