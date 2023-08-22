@@ -57,7 +57,7 @@ if response.status_code == 200:
     if not os.path.exists(directory_name):
         os.makedirs(directory_name)
     
-    local_file_path = os.path.join(directory_name, "BTCapsule_test.py")
+    local_file_path = os.path.join(directory_name, "BTCapsule_testnet.py")
     
     with open(local_file_path, "wb") as file:
         file.write(raw_code)
