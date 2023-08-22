@@ -472,6 +472,11 @@ accept your redeem script. If you get an error:
 sendrawtransactiom RPC error: 
 {"code":-26,"message":"non-final"}
 this means the transaction is working as expected. Please wait a few hours and try again.
+
+If the transaction is accepted, but after a few hours it is not confirmed, the orginal miner fees may be too
+low. You can speed up the process by using a method called Child-Pays-For-Parent, but directions to do this
+may change over time. Please use whatever resources you have to learn more. Everything needed to
+use this method is included in this wallet.
 				
 				
 				"""
